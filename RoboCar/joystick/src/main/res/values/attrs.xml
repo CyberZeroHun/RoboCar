@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="Joystick">
+        <attr name="outerCircleWidth" format="dimension" />
+        <attr name="innerCircleRadius" format="dimension" />
+        <attr name="innerCircleColor" format="color" />
+        <attr name="outerCircleColor" format="color" />
+        <attr name="lineColor" format="color" />
+        <attr name="innerCircleStyle" format="enum" >
+            <enum name="FILL" value="0" />
+            <enum name="STROKE" value="1" />
+        </attr>
+        <attr name="outerCircleStyle" format="enum" >
+            <enum name="FILL" value="0" />
+            <enum name="STROKE" value="1" />
+        </attr>
+        <attr name="lineWidth" format="dimension"/>
+        <attr name="resetPositionOnRelease" format="boolean" />
+        <attr name="drawCrosshair" format="boolean" />
+        <attr name="animate" format="boolean" />
+    </declare-styleable>
+</resources>

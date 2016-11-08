@@ -1,0 +1,10 @@
+<resources>
+
+    <!-- v21-nél módosítjuk az ActionBar nélküli témát -->
+    <style name="AlapTema.ActionBarNelkul">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/colorAtlatszo</item>
+    </style>
+</resources>

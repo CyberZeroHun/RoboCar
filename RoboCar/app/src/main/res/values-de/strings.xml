@@ -1,0 +1,24 @@
+<!-- A német nyelvű string erőforrások -->
+<resources>
+    <string name="app_name">RoboCar</string>
+    <string name="dev">Entwickler</string>
+    <string name="aa">Ambrus Attila</string>
+    <string name="zc">Zisis Christoforos</string>
+    <string name="maintab">Main</string>
+    <string name="ultrahang">Ultraschall</string>
+    <string name="manualisvezerles">Manuelle Kontrolle</string>
+    <string name="aktivitasok">Aktivitäten</string>
+    <string name="beallitasok">Einstellungen</string>
+    <string name="nevjegy">Etwa</string>
+    <string name="nev">Name:</string>
+    <string name="email">E-mail:</string>
+    <string name="projekt">Projekt:</string>
+    <string name="nevjegy_szoveg">%1$s %10$s\r\n\r\nGitHub Repository:\r\n%2$s\r\n\r\n%3$s:\r\n\r\n%4$s %6$s\r\n%5$s %7$s\r\n\r\n%4$s %8$s\r\n%5$s %9$s</string>
+    <string name="ido">Zeit:</string>
+    <string name="szog">Winkel:</string>
+    <string name="tavolsag">Entfernung:</string>
+    <string name="erzekelesi_tavolsag">Schaltabstand:</string>
+    <string name="erzekelesi_szog">Erfassungswinkel:</string>
+    <string name="tavolsagosztok">Anzahl der Entfernungsteilern:</string>
+    <string name="szogosztok">Anzahl der Winkelteilern:</string>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Az ultrahang modul paraméterei -->
+    <declare-styleable name="UltrasonicView">
+        <attr name="tavolsag" format="integer" />
+        <attr name="tavolsag_osztok" format="integer" />
+        <attr name="szog" format="integer" />
+        <attr name="szog_osztok" format="integer" />
+        <attr name="vonal_szin" format="color" />
+        <attr name="szoveg_szin" format="color" />
+        <attr name="mert_vonal_szin" format="color" />
+        <attr name="korvonal_szin" format="color" />
+        <attr name="mutato_szin" format="color" />
+        <attr name="mutato_haromszog_szin" format="color" />
+    </declare-styleable>
+</resources>

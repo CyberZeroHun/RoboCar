@@ -1,0 +1,27 @@
+<!-- A string erőforrások alapjáraton angol nyelvűek -->
+<resources>
+    <string name="app_name">CIWSduino</string>
+    <string name="dev">Developers</string>
+    <string name="aa">Attila Ambrus</string>
+    <string name="zc">Christoforos Zisis</string>
+    <string name="maintab">Main</string>
+    <string name="ultrahang">Ultrasound</string>
+    <string name="manualisvezerles">Manual Control</string>
+    <string name="aktivitasok">Activities</string>
+    <string name="beallitasok">Settings</string>
+    <string name="nevjegy">About</string>
+    <string name="nev">Name:</string>
+    <string name="email">E-mail:</string>
+    <string name="projekt">Project:</string>
+    <string name="nevjegy_szoveg">%1$s %10$s\r\n\r\nGitHub Repository:\r\n%2$s\r\n\r\n%3$s:\r\n\r\n%4$s %6$s\r\n%5$s %7$s\r\n\r\n%4$s %8$s\r\n%5$s %9$s</string>
+    <string name="ido">Time:</string>
+    <string name="szog">Angle:</string>
+    <string name="tavolsag">Distance:</string>
+    <string name="erzekelesi_tavolsag">Sensing distance:</string>
+    <string name="erzekelesi_szog">Sensing angle:</string>
+    <string name="tavolsagosztok">Number of distance dividers:</string>
+    <string name="szogosztok">Number of angle dividers:</string>
+    <string name="fegyver_szog">Turret angle: </string>
+    <string name="load_Stream">Loading stream...</string>
+    <string name="kamera">Camera</string>
+</resources>

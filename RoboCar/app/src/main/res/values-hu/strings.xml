@@ -1,0 +1,27 @@
+<!-- A magyar nyelvű string erőforrások -->
+<resources>
+    <string name="app_name">RoboCar</string>
+    <string name="dev">Fejlesztők</string>
+    <string name="aa">Ambrus Attila</string>
+    <string name="zc">Zisis Christoforos</string>
+    <string name="maintab">Main</string>
+    <string name="ultrahang">Ultrahang</string>
+    <string name="manualisvezerles">Manuális Vezérlés</string>
+    <string name="aktivitasok">Aktivitások</string>
+    <string name="beallitasok">Beállítások</string>
+    <string name="nevjegy">Névjegy</string>
+    <string name="nev">Név:</string>
+    <string name="email">E-mail:</string>
+    <string name="projekt">Projekt:</string>
+    <string name="nevjegy_szoveg">%1$s %10$s\r\n\r\nGitHub Repository:\r\n%2$s\r\n\r\n%3$s:\r\n\r\n%4$s %6$s\r\n%5$s %7$s\r\n\r\n%4$s %8$s\r\n%5$s %9$s</string>
+    <string name="ido">Idő:</string>
+    <string name="szog">Szög:</string>
+    <string name="tavolsag">Távolság:</string>
+    <string name="erzekelesi_tavolsag">Érzékelési távolság:</string>
+    <string name="erzekelesi_szog">Érzékelési szög:</string>
+    <string name="tavolsagosztok">Távolságosztók száma:</string>
+    <string name="szogosztok">Szögosztók száma:</string>
+    <string name="fegyver_szog">Fegyver szöge:</string>
+    <string name="load_Stream">Stream betöltése...</string>
+    <string name="kamera">Kamera</string>
+</resources>

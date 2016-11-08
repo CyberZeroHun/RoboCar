@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/black">
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/cim"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/cim_szoveg_meret"
+        android:textColor="@color/colorAlap"
+        android:text="@string/maintab"
+        />
+    <hu.uniobuda.nik.ciwsduino.ultrasonic.UltrasonicView
+        android:id="@+id/ultrahang"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        custom:tavolsag="500"
+        custom:tavolsag_osztok="10"
+        custom:szog="120"
+        custom:szog_osztok="8"
+        android:background="@color/black"
+        custom:vonal_szin="@color/colorHangsulyos"
+        custom:szoveg_szin="@color/colorAlapSotet"
+        custom:mert_vonal_szin="@color/colorVilagosSzurke"
+        custom:korvonal_szin="@color/colorAlap"
+        custom:mutato_szin="@color/blue"
+        custom:mutato_haromszog_szin="@color/transp_blue"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/cim" />
+
+    <hu.uniobuda.nik.joystick.Joystick
+        android:id="@+id/joystick_1"
+        app:innerCircleColor="@color/colorAccent"
+        app:outerCircleColor="@color/colorAlapSotet"
+        app:innerCircleRadius="10dp"
+        app:lineColor="@color/colorFekete"
+        app:lineWidth="2dp"
+        app:innerCircleStyle="FILL"
+        app:outerCircleStyle="FILL"
+        app:resetPositionOnRelease="false"
+        app:drawCrosshair="true"
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:id="@+id/angleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:layout_below="@+id/cim"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>

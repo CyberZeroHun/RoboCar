@@ -1,0 +1,7 @@
+<resources>
+    <!--
+    A 7 és 10 colos eszközök fektetve körülbelül 960 és 1280dp körüliek.
+    Az alap alkalmazásban ezt a felesleges helyet a margó növelésével töltjük fel.
+    -->
+    <dimen name="vizszintes_margo">64dp</dimen>
+</resources>

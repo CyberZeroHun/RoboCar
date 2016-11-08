@@ -1,0 +1,28 @@
+<resources>
+
+    <!-- Az alkalamzás alap témája a DarkActionBar-ból-->
+    <style name="AlapTema" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorAlap</item>
+        <item name="colorPrimaryDark">@color/colorAlapSotet</item>
+        <item name="colorAccent">@color/colorHangsulyos</item>
+        <item name="android:textSize">@dimen/szoveg_meret</item>
+    </style>
+
+    <!-- Az alaptéma ActionBar nélküli változata -->
+    <style name="AlapTema.ActionBarNelkul">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Vastag középre igazított szöveg -->
+    <style name="AlapTema.VastagKozep">
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textColor">@color/colorAlap</item>
+    </style>
+
+    <!-- Az alaptéma Fülekhez készített változata a ThemeOverlay-ből-->
+    <style name="AlapTema.AppBarFedo" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AlapTema.PopupFedo" parent="ThemeOverlay.AppCompat.Light" />
+
+</resources>

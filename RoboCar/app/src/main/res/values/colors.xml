@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAtlatszo">#00000000</color>
+    <color name="colorFekete">#000000</color>
+    <color name="colorFeher">#ffffff</color>
+    <color name="colorAlap">#00ace7</color>
+    <color name="colorAlapSotet">#0091d2</color>
+    <color name="colorHangsulyos">#004a78</color>
+    <color name="colorVilagosSzurke">#cbcccc</color>
+
+    <color name="black">#000000</color>
+    <color name="dark_green">#1e561d</color>
+    <color name="yellow">#dfd518</color>
+    <color name="blue">#1031ec</color>
+    <color name="green">#16d113</color>
+    <color name="red">#ea0d32</color>
+    <color name="transp_green">#7d50f078</color>
+    <color name="transp_blue">#7d00fdf5</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+</resources>

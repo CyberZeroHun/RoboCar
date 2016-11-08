@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/colorFekete">
+
+    <!-- Ebben lesz a CIWS logó. -->
+    <android.support.v7.widget.AppCompatImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/logo_robocar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true" />
+
+    <!-- Ezekben lesz feltüntetve, hogy kik fejlesztették az appot. -->
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/keszitok"
+        style="@style/AlapTema.VastagKozep"
+        android:textSize="@dimen/cim_szoveg_meret"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dev"
+        android:layout_above="@+id/nev1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/nev1"
+        style="@style/AlapTema.VastagKozep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/aa"
+        android:layout_above="@+id/nev2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/nev2"
+        style="@style/AlapTema.VastagKozep"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/zc"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>
