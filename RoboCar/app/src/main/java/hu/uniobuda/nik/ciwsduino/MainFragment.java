@@ -30,7 +30,9 @@ public class MainFragment extends Fragment {
     };
 
     private Joystick joystick1;
+    private Joystick joystick2;
     private TextView angleTextView;
+    private TextView speedTextView;
 
     @Nullable
     @Override
@@ -40,13 +42,32 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         angleTextView = (TextView)view.findViewById(R.id.angleTextView);
+        speedTextView = (TextView)view.findViewById(R.id.speedTextView);
 
         joystick1 = (Joystick)view.findViewById(R.id.joystick_1);
+        joystick2 = (Joystick)view.findViewById(R.id.joystick_2);
 
         joystick1.setJoystickEventListener(new JoystickEventListener() {
             @Override
             public void onPositionChange(float x, float y, float deg) {
-                angleTextView.setText(getString(R.string.fegyver_szog) + Float.toString(deg));
+                angleTextView.setText(Float.toString(Math.round(deg)) + "°");
+            }
+
+            @Override
+            public void onJoystickReleased() {
+
+            }
+
+            @Override
+            public void onJoystickTouched() {
+
+            }
+        });
+
+        joystick2.setJoystickEventListener(new JoystickEventListener() {
+            @Override
+            public void onPositionChange(float x, float y, float deg) {
+                speedTextView.setText(Float.toString(Math.round(y * 100)));
             }
 
             @Override
