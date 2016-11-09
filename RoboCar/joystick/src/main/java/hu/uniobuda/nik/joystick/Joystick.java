@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
@@ -15,10 +16,11 @@ import android.view.ViewParent;
 /**
  * Joystick view implementation.
  * Created by Christoforos Zisis on 07/05/16.
+ *
  * @author Christoforos Zisis
  * @version 1.0.1
- *
- * TODO: Since android has a nice implementation for points --> Replace {hu.uniobuda.nik.joystick.Point} with {android.graphics.PointF}
+ *          <p>
+ *          TODO: Since android has a nice implementation for points --> Replace {hu.uniobuda.nik.joystick.Point} with {android.graphics.PointF}
  */
 public class Joystick extends View {
 
@@ -32,27 +34,27 @@ public class Joystick extends View {
     private static final boolean RESET_POSITION_AFTER_RELEASE = true;
     private static final boolean DRAW_CROSSHAIR = false;
     private static final boolean ANIMATE = true;
-    private static final float[] angles = new float[] {
-            (float)Math.toRadians(0),
-            (float)Math.toRadians(22.5),
-            (float)Math.toRadians(45),
-            (float)Math.toRadians(67.5),
-            (float)Math.toRadians(90),
-            (float)Math.toRadians(112.5),
-            (float)Math.toRadians(135),
-            (float)Math.toRadians(157.5),
-            (float)Math.toRadians(180),
-            (float)Math.toRadians(202.5),
-            (float)Math.toRadians(225),
-            (float)Math.toRadians(247.5),
-            (float)Math.toRadians(270),
-            (float)Math.toRadians(292.5),
-            (float)Math.toRadians(315),
-            (float)Math.toRadians(337.5)
+    private static final float[] angles = new float[]{
+            (float) Math.toRadians(0),
+            (float) Math.toRadians(22.5),
+            (float) Math.toRadians(45),
+            (float) Math.toRadians(67.5),
+            (float) Math.toRadians(90),
+            (float) Math.toRadians(112.5),
+            (float) Math.toRadians(135),
+            (float) Math.toRadians(157.5),
+            (float) Math.toRadians(180),
+            (float) Math.toRadians(202.5),
+            (float) Math.toRadians(225),
+            (float) Math.toRadians(247.5),
+            (float) Math.toRadians(270),
+            (float) Math.toRadians(292.5),
+            (float) Math.toRadians(315),
+            (float) Math.toRadians(337.5)
     };
-    private static final Paint.Style[] STYLES = new Paint.Style[] {
-        Paint.Style.FILL,
-        Paint.Style.STROKE
+    private static final Paint.Style[] STYLES = new Paint.Style[]{
+            Paint.Style.FILL,
+            Paint.Style.STROKE
     };
     //</editor-fold>
 
@@ -241,13 +243,22 @@ public class Joystick extends View {
                 }
                 // Let's translate the x and y position into the [-1, 1] range and call the callback with it;
                 if (listener != null) {
-                    //                  Log.v("TEST", String.format("%f", Math.abs(outerCircleRadius - joy.x % outerCircleRadius) - 1));
                     posX = translate(joy.x, centerX);
                     posY = -translate(joy.y, centerY);
 
-                    double deg = Math.toDegrees(Math.atan2(posY, posX));
+                    double rad = Math.atan2(posY, posX);
+                    double deg = rad * (180 / Math.PI);
 
-                    if (deg < 0) deg = Math.abs(deg) + 180;
+                    if (posX < 0) {
+                        if (posY < 0) {
+                            deg *= -1;
+                            deg = -1 * (270 - deg);
+                        } else {
+                            deg = 90 - deg;
+                        }
+                    } else {
+                        deg = 90 - deg;
+                    }
 
                     listener.onPositionChange(posX, posY, (float) deg);
                 }
@@ -274,16 +285,16 @@ public class Joystick extends View {
 
     /**
      * Calculates the distance between two points in the coordinate system.
+     *
      * @param a {Point}
      * @param b {Point}
      * @return distance between {Point} a and {Point} b
      */
     private float getDistance(final Point a, final Point b) {
-        return (float)Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
+        return (float) Math.sqrt((b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y));
     }
 
     /**
-     *
      * @param point
      * @param center
      * @param radius
@@ -302,13 +313,14 @@ public class Joystick extends View {
 
         float disc = pBy2 * pBy2 - q;
 
-        float abScalingFactor1 = -pBy2 + (float)Math.sqrt(disc);
+        float abScalingFactor1 = -pBy2 + (float) Math.sqrt(disc);
 
         return new Point(point.x - caX * abScalingFactor1, point.y - caY * abScalingFactor1);
     }
 
     /**
      * Translates the joystick's position into the [-1, 1] range (needs * -1 for the y axis)
+     *
      * @param number The joystick's position on a given axis
      * @param offset The center coordinate of that axis
      */
@@ -332,6 +344,7 @@ public class Joystick extends View {
 
     /**
      * Sets the joystick's position based on an x and y location
+     *
      * @param x float between [-1, 1]
      * @param y float between [-1, 1]
      */
