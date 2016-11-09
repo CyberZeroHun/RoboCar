@@ -1,4 +1,4 @@
-package hu.uniobuda.nik.ciwsduino;
+package hu.uniobuda.nik.robocar;
 
 import org.junit.Test;
 

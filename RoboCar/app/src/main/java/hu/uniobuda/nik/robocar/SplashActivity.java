@@ -1,4 +1,4 @@
-package hu.uniobuda.nik.ciwsduino;
+package hu.uniobuda.nik.robocar;
 
 import android.content.Intent;
 import android.os.Bundle;
