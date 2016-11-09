@@ -1,11 +1,10 @@
-package hu.uniobuda.nik.ciwsduino;
+package hu.uniobuda.nik.robocar;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by thecy on 2016. 04. 26..

@@ -1,4 +1,4 @@
-package hu.uniobuda.nik.ciwsduino;
+package hu.uniobuda.nik.robocar;
 
 /**
  * Created by thecy on 2016. 05. 06..

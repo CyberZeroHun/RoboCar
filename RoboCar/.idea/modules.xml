@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RobotAuto.iml" filepath="$PROJECT_DIR$/RobotAuto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/RoboCar.iml" filepath="$PROJECT_DIR$/RoboCar.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/joystick/joystick.iml" filepath="$PROJECT_DIR$/joystick/joystick.iml" />
       <module fileurl="file://$PROJECT_DIR$/ultrasonic/ultrasonic.iml" filepath="$PROJECT_DIR$/ultrasonic/ultrasonic.iml" />

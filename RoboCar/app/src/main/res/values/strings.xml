@@ -1,6 +1,6 @@
 <!-- A string erőforrások alapjáraton angol nyelvűek -->
 <resources>
-    <string name="app_name">CIWSduino</string>
+    <string name="app_name">RoboCar</string>
     <string name="dev">Developers</string>
     <string name="aa">Attila Ambrus</string>
     <string name="zc">Christoforos Zisis</string>

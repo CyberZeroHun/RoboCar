@@ -1,4 +1,4 @@
-package hu.uniobuda.nik.ciwsduino;
+package hu.uniobuda.nik.robocar;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import hu.uniobuda.nik.ciwsduino.ultrasonic.UltrasonicView;
+import hu.uniobuda.nik.robocar.ultrasonic.UltrasonicView;
 import hu.uniobuda.nik.joystick.Joystick;
 import hu.uniobuda.nik.joystick.JoystickEventListener;
 

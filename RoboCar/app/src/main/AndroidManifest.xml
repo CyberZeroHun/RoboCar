@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="hu.uniobuda.nik.ciwsduino">
+    package="hu.uniobuda.nik.robocar">
 
 	<!-- bluetooth jogok -->
 	<uses-permission android:name="android.permission.BLUETOOTH" />
@@ -8,7 +8,7 @@
 	
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_ciwsduino"
+        android:icon="@mipmap/ic_robocar"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AlapTema">
@@ -18,7 +18,8 @@
         A SplashActivity-re kikényszerítjük az álló elrendezést.
         Hogy ne vegyen el helyet az ActionBar a SplashScreen-ből átállítjuk a Témát.
         -->
-        <activity android:name=".SplashActivity"
+        <activity android:name="hu.uniobuda.nik.robocar.SplashActivity"
+            android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AlapTema.ActionBarNelkul">
             <intent-filter>
@@ -28,7 +29,9 @@
         </activity>
 
         <!-- Hogy programkódból a MainActivity-hez is hozzáférjünk fel kell itt venni. -->
-        <activity android:name=".MainActivity"
+        <activity android:name="hu.uniobuda.nik.robocar.MainActivity"
+            android:configChanges="orientation"
+            android:screenOrientation="landscape"
             android:label="@string/app_name"
             android:theme="@style/AlapTema.ActionBarNelkul">
         </activity>

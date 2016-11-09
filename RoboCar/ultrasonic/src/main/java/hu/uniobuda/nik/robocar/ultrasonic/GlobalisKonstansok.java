@@ -1,7 +1,4 @@
-package hu.uniobuda.nik.ciwsduino.ultrasonic;
-
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
+package hu.uniobuda.nik.robocar.ultrasonic;
 
 /**
  * Created by thecy on 2016. 05. 05..

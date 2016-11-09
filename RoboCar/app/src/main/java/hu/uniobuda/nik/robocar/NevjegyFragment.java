@@ -1,8 +1,6 @@
-package hu.uniobuda.nik.ciwsduino;
+package hu.uniobuda.nik.robocar;
 
 import android.content.res.Resources;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,7 +9,6 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.view.LayoutInflater;
@@ -20,7 +17,7 @@ import android.view.ViewGroup;
 
 import java.util.regex.Pattern;
 
-import static hu.uniobuda.nik.ciwsduino.GlobalisKonstansok.*;
+import static hu.uniobuda.nik.robocar.GlobalisKonstansok.*;
 
 /**
  * Created by thecy on 2016. 04. 25..

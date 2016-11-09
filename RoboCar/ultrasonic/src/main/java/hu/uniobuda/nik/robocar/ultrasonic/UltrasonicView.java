@@ -1,4 +1,4 @@
-package hu.uniobuda.nik.ciwsduino.ultrasonic;
+package hu.uniobuda.nik.robocar.ultrasonic;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,14 +10,13 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.Build;
-import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.ArrayList;
 
 //A globális konstansok importálásához
-import static hu.uniobuda.nik.ciwsduino.ultrasonic.GlobalisKonstansok.*;
+import static hu.uniobuda.nik.robocar.ultrasonic.GlobalisKonstansok.*;
 
 /**
  * Created by thecy on 2016. 04. 05..

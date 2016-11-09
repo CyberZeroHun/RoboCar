@@ -36,7 +36,7 @@
         android:textColor="@color/colorAlap"
         android:textSize="16sp"/>
 
-    <hu.uniobuda.nik.ciwsduino.ultrasonic.UltrasonicView
+    <hu.uniobuda.nik.robocar.ultrasonic.UltrasonicView
         android:id="@+id/ultrahang"
         android:layout_width="290dp"
         android:layout_height="200dp"
