@@ -11,6 +11,7 @@ import android.graphics.Point;
 import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class UltrasonicView extends View {
     int vonalszin, szovegszin, mertvonalszin, korvonalszin, mutatoszin, mutatoharomszogszin;
 
     private void beallitas_kozosresz(){
+        //a jelölő háromszöget kezdetben egyenesnek vesszük és a jelölőre állítjuk: első szög, hátsó szög
         aktSzog=(180-szog)/2;
         elsoSzog=aktSzog;
         hatsoSzog=aktSzog;
@@ -46,6 +48,7 @@ public class UltrasonicView extends View {
         mireFest2.setStrokeJoin(Paint.Join.ROUND);
         mireFest3.setAntiAlias(true);
         //kezdeti feltöltés 0-ákkal
+        //a szögek 0-tól vannak a beállított legutolsó szögig, pl most 150
         adatok=new ArrayList<Float>(szog);
         for (int i=0;i<szog;i++){
             adatok.add(0f);
@@ -141,35 +144,91 @@ public class UltrasonicView extends View {
     }
 
     public void UjErtek(int szg, float tav, int ir){
+        //mielőtt bármit csinálnánk levágjuk a távnak azon részét, ami már
+        //nem jeleníthető meg a skálánkon
+        if(tav>tavolsag) tav=tavolsag;
+        //felvesszük az adatot (de eltolva)
+        int valami=((180-szog)/2); //30
+        adatok.set(szg-valami, tav);
+
+        //oda állítja a jelölőt, ahol az új beérkező adat van
         aktSzog=szg;
-        adatok.set(szg, tav);
 
-        int kulonbseg=0;
-
-        //a haladási iránytól függően beállítjuk az új értékeket a jelölőhöz és a jelölő kis háromszöghöz
-        if(ir==1) {
-            if (szg <= JELOLO_HAROMSZOG_MERETE / 2) {
-                hatsoSzog=0;
-                elsoSzog=aktSzog+ JELOLO_HAROMSZOG_MERETE /2;
-            } else if (szg>= szog- JELOLO_HAROMSZOG_MERETE /2){
-                elsoSzog=szog;
-                //hatsoSzog=aktSzog-JELOLO_HAROMSZOG_MERETE/2;
-                hatsoSzog=aktSzog-(szog-aktSzog);
-            } else {
-                elsoSzog=aktSzog+ JELOLO_HAROMSZOG_MERETE /2;
-                hatsoSzog=aktSzog- JELOLO_HAROMSZOG_MERETE /2;
+        //a haladási iránytól függően beállítjuk az új értékeket (első szög, hátsó szög)
+        // a jelölőhöz és a jelölő kis háromszöghöz
+        int jeloloFele=JELOLO_HAROMSZOG_MERETE / 2;
+        //TODO: EZT A RÉSZÉT KELL MAJD MEGCSINÁLNI, EMIATT CSÚSZIK A HATÁROKON
+        /*
+        if(ir==1) { //balról megyünk jobbra
+            if (szg <= jeloloFele) { //a jelölő bal oldali felét még nem tudjuk teljesen kirajzolni
+                hatsoSzog = 0;
+                elsoSzog = aktSzog + jeloloFele;
+            } else if (szg >= szog - jeloloFele){ //a jelölő jobb oldali felét már nem tudjuk teljesen kirajzolni
+                elsoSzog = szog;
+                //hatsoSzog = aktSzog - jeloloFele;
+                hatsoSzog = aktSzog - (szog - aktSzog);
+            } else { //mindkét felét ki tudjuk simán rajzolni
+                elsoSzog = aktSzog + jeloloFele;
+                hatsoSzog = aktSzog - jeloloFele;
             }
-        } else {
-            if (szg >= szog - JELOLO_HAROMSZOG_MERETE / 2) {
-                hatsoSzog=szog;
-                elsoSzog=aktSzog- JELOLO_HAROMSZOG_MERETE /2;
-            } else  if (szg <= JELOLO_HAROMSZOG_MERETE / 2) {
-                elsoSzog=0;
-                //hatsoSzog=aktSzog+JELOLO_HAROMSZOG_MERETE/2;
-                hatsoSzog=aktSzog+(0+aktSzog);
+        } else { //ugyanaz csak jobbról megyünk balra
+            if (szg >= szog - jeloloFele) {
+                hatsoSzog = szog;
+                elsoSzog = aktSzog - jeloloFele;
+            } else  if (szg <= jeloloFele) {
+                elsoSzog = 0;
+                //hatsoSzog = aktSzog + jeloloFele
+                hatsoSzog = aktSzog +(0 + aktSzog);
             } else {
-                elsoSzog=aktSzog- JELOLO_HAROMSZOG_MERETE /2;
-                hatsoSzog=aktSzog+ JELOLO_HAROMSZOG_MERETE /2;
+                elsoSzog = aktSzog - jeloloFele;
+                hatsoSzog = aktSzog + jeloloFele;
+            }
+        }
+        */
+        //
+        /*
+        balról jobbra, amikor minden kirajzolható: 3
+        jobbról balra, amikor minden kirajzolható: 6
+        1->3->2 , majd visszafelé 4->6->5
+        */
+        //szg: az aktuálisan mért szög, most 30..150
+        //jeloloFele: most a jelölö 10, így a fele 5
+        //szog: a teljes szögtartomány: most 150-30=120
+
+        //a valamivel itt is korrigálnunk kell (a kezdő szöggel)
+        if(ir==1) { //balról megyünk jobbra
+            //amikor balról jobbra megy, akkor
+            //az első szög a jobb oldali, a hátsó szög pedig a bal oldali
+            if ((szg-valami) <= jeloloFele) { //a jelölő bal oldali felét még nem tudjuk teljesen kirajzolni
+                hatsoSzog = 0+valami;
+                elsoSzog = aktSzog + jeloloFele;
+                Log.d("Teszt","1) bal(hatsoszog): "+hatsoSzog+" jobb(elsoszog): "+elsoSzog);
+            } else if (szg >= szog + valami - jeloloFele){ //a jelölő jobb oldali felét már nem tudjuk teljesen kirajzolni
+                elsoSzog = szog+valami;
+                //hatsoSzog = aktSzog - jeloloFele;
+                hatsoSzog = aktSzog - (szog - aktSzog)-valami;
+                Log.d("Teszt","2) bal(hatsoszog): "+hatsoSzog+" jobb(elsoszog): "+elsoSzog);
+            } else { //mindkét felét ki tudjuk simán rajzolni
+                elsoSzog = aktSzog + jeloloFele;
+                hatsoSzog = aktSzog - jeloloFele;
+                Log.d("Teszt","3) bal(hatsoszog): "+hatsoSzog+" jobb(elsoszog): "+elsoSzog);
+            }
+        } else { //ugyanaz csak jobbról megyünk balra
+            //amikor jobbról balra megy, akkor
+            //az első szög a bal oldali, a hátsó szög pedig a jobb oldali
+            if (szg >= szog + valami - jeloloFele) { // a jobb oldali felét még nem
+                hatsoSzog = szog+valami;
+                elsoSzog = aktSzog - jeloloFele;
+                Log.d("Teszt","4) bal(elsoszog): "+elsoSzog+" jobb(hatsoszog): "+hatsoSzog);
+            } else  if (szg-valami <= jeloloFele) { // a bal oldali felét már nem
+                elsoSzog = 0+valami;
+                //hatsoSzog = aktSzog + jeloloFele
+                hatsoSzog = aktSzog +(0 + aktSzog)-valami;
+                Log.d("Teszt","5) bal(elsoszog): "+elsoSzog+" jobb(hatsoszog): "+hatsoSzog);
+            } else { //mindkét felét ki tudja
+                elsoSzog = aktSzog - jeloloFele;
+                hatsoSzog = aktSzog + jeloloFele;
+                Log.d("Teszt","6) bal(elsoszog): "+elsoSzog+" jobb(hatsoszog): "+hatsoSzog);
             }
         }
         //jelezzük, hogy új értékkor újra kell majd rajzoltatni
@@ -202,8 +261,14 @@ public class UltrasonicView extends View {
         int vizszintes_eltolas_kozepre=getWidth() - VIZSZINTES_MARGO-szel/2;
         */
 
-        int kezdSzog=180+((180-szog)/2);
-        int vegSzog=kezdSzog+szog;
+        //most 120°-os a teljes tartományunk
+        // a kezdőszög (180-120)/2)=30°
+        // a zárószög pedig 30+120=150°
+        // de el kell tolnunk 180°-al, hogy a helyére kerüljön
+        //a kezdőt eltoljuk, de mivel a végsőt is ez alapján számítjuk, így az is eltolódik
+        //tehát kezdő 210, végső 330°
+        int kezdSzog=180+((180-szog)/2); //30
+        int vegSzog=kezdSzog+szog; //150
 
         int scaledSize = getResources().getDimensionPixelSize(R.dimen.ultrasonic_font_size);
         mireFest.setTextSize(scaledSize);
@@ -250,11 +315,13 @@ public class UltrasonicView extends View {
             mireFest.setColor(szovegszin);
             canvas.drawText(szg-180+"°",stopX+ VIZSZINTES_MARGO /2,stopY+ FUGGOLEGES_MARGO - SZOVEG_FUGGOLEGES_OFFSET,mireFest);
         }
+
         //mert ertekek kirajzolása
         for(int i=0; i<szog; i++){
             mireFest2.setStrokeWidth(7f);
             mireFest2.setColor(mertvonalszin);
-            double parameter = (180+i+30) * Math.PI / 180;
+            //double parameter = (180+i+30) * Math.PI / 180;
+            double parameter = (i+kezdSzog) * Math.PI / 180;
             float stopX = (float) (szel/2 + (adatok.get(i)/ TAV)*szel/2 * Math.cos(parameter));
             float stopY = (float) (mag + (adatok.get(i)/ TAV)*mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
             pontok.set(i, new Point((int) stopX, (int) stopY));
@@ -288,23 +355,33 @@ public class UltrasonicView extends View {
         mireFest3.setStyle(Paint.Style.FILL_AND_STROKE);
         //mireFest3.setShader(new LinearGradient(0,0,szel,mag,0x00000000,0xff40f078, Shader.TileMode.CLAMP));
         int startX = szel/2;
-        int startY =mag;
+        int startY = mag;
         haromszogUtvonal.reset();
         haromszogUtvonal.moveTo(startX + VIZSZINTES_MARGO / 2, startY + FUGGOLEGES_MARGO);
-        parameter = (180+elsoSzog+30) * Math.PI / 180;
+        //a jelölő háromszög eleje az alap  skálán van megadva, hogy hol tart, jelen esetben a 0..150-es skálán elsoszognyire
+        //korábban már megbeszéltük, hogy 180°-al el kell tolni a szöget, hogy jó legyen
+        //a * Math.PI / 180 csak a számításhoz alakít át rad-iánba
+        //de akkor mi az a +30???
+        //double parameter = (180+elsoSzog+30) * Math.PI / 180;
+         parameter = (elsoSzog+180) * Math.PI / 180;
+         stopX2 = (float) (szel/2 + szel/2 * Math.cos(parameter));
+         stopY2 = (float) (mag + mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
+        haromszogUtvonal.lineTo(stopX2 + VIZSZINTES_MARGO / 2, stopY2 + FUGGOLEGES_MARGO);
+        //a jelölő háromszög eleje
+        //parameter = (180+hatsoSzog+30) * Math.PI / 180;
+        parameter = (hatsoSzog+180) * Math.PI / 180;
         stopX2 = (float) (szel/2 + szel/2 * Math.cos(parameter));
         stopY2 = (float) (mag + mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
         haromszogUtvonal.lineTo(stopX2 + VIZSZINTES_MARGO / 2, stopY2 + FUGGOLEGES_MARGO);
-        parameter = (180+hatsoSzog+30) * Math.PI / 180;
-        stopX2 = (float) (szel/2 + szel/2 * Math.cos(parameter));
-        stopY2 = (float) (mag + mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
-        haromszogUtvonal.lineTo(stopX2 + VIZSZINTES_MARGO / 2, stopY2 + FUGGOLEGES_MARGO);
+       //kirajzolja
         canvas.drawPath(haromszogUtvonal, mireFest3);
 
         //hol tartunk - radar vonal
+        //ez pedig a jelölő háromszögbe rajzolja a radar vonalát
         mireFest3.setStrokeWidth(7f);
         mireFest3.setColor(mutatoszin);
-        parameter = (180+aktSzog+30) * Math.PI / 180;
+        //parameter = (180+aktSzog+30) * Math.PI / 180;
+        parameter = (aktSzog+180) * Math.PI / 180;
         stopX2 = (float) (szel/2 + szel/2 * Math.cos(parameter));
         stopY2 = (float) (mag + mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
         canvas.drawLine(szel / 2 + VIZSZINTES_MARGO / 2, mag + FUGGOLEGES_MARGO, stopX2 + VIZSZINTES_MARGO / 2, stopY2 + FUGGOLEGES_MARGO, mireFest3);

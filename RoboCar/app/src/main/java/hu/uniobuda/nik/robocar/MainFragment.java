@@ -1,16 +1,21 @@
 package hu.uniobuda.nik.robocar;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+import app.akexorcist.bluetotohspp.library.BluetoothSPP;
+import app.akexorcist.bluetotohspp.library.BluetoothState;
 import hu.uniobuda.nik.robocar.ultrasonic.UltrasonicView;
 import hu.uniobuda.nik.joystick.Joystick;
 import hu.uniobuda.nik.joystick.JoystickEventListener;
@@ -20,14 +25,26 @@ import hu.uniobuda.nik.joystick.JoystickEventListener;
  */
 public class MainFragment extends Fragment {
 
-    /*
-    Teszt adatok, amelyeket folyósón mértünk
-    medián szűrő alkalmazásával és visszhangot csökkentő hengerrel.
-    A Bluetooth kapcsolatot helyettesítjük a példában a teszt adatokkal.
-     */
-    private int tavolsagok[] = {
-            110,126,125,126,107,107,107,107,107,105,107,105,105,105,103,104,103,103,98,98,98,98,162,97,97,97,97,97,97,98,98,98,97,99,98,52,135,193,273,197,275,214,267,267,267,266,265,265,256,265,114,265,265,55,264,257,264,93,75,76,75,75,74,74,74,74,74,74,74,73,48,73,73,74,74,73,73,73,73,74,73,73,74,74,74,74,74,49,48,47,47,48,48,47,47,46,40,45,38,45,37,45,37,44,37,41,39,41,41,40,40,40,40,40,40,40,41,41,41,41,47,47,47,47,47,41,41,41,41,40,40,40,40,40,41,40,40,42,42,41,45,45,45,45,45,45,46,46,47,46,47,47,47,47,48,48,49,50,74,74,74,74,73,73,73,73,73,73,73,74,73,49,73,74,74,74,74,74,74,74,48,75,74,74,75,75,76,195,265,265,265,264,265,265,265,265,190,195,207,266,207,267,195,195,137,274,136,102,133,133,134,252,98,275,98,276,97,171,162,99,97,107,98,102,98,159,161,105,97,103,107,104,105,105,127,108,108,105,165,54,108,126
-    };
+    //a bluetooth példány
+    BluetoothSPP bt = null;
+
+    public void blueToothCsatlakozas(Context c){
+        if(!bt.isBluetoothAvailable()) {
+            //ha nincs bt a telefonban hiba
+            Toast.makeText(c, getResources().getString(R.string.hiba1), Toast.LENGTH_SHORT).show();
+            //finish();
+            return;
+        } else if(!bt.isBluetoothEnabled()){
+            //ha nincs még bekapcsolva
+            bt.enable();
+        } else {
+            if(!bt.isServiceAvailable()) {
+                bt.setupService();
+            }
+            bt.startService(BluetoothState.DEVICE_OTHER);
+            bt.autoConnect("RoboCarBT");
+        }
+    }
 
     private Joystick joystick1;
     private Joystick joystick2;
@@ -39,7 +56,125 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         //beinflate-elem a fragment-be az xml tartalmát
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        final View view = inflater.inflate(R.layout.fragment_main, container, false);
+        //final Context ctx = view.getContext();
+        final Context ctx = getActivity().getApplicationContext();
+
+        //a bluetoothoz
+        bt = new BluetoothSPP(ctx);
+        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
+            @Override
+            public void onAutoConnectionStarted() {
+
+            }
+
+            @Override
+            public void onNewConnection(String name, String address) {
+
+            }
+        });
+
+        bt.setBluetoothStateListener(new BluetoothSPP.BluetoothStateListener() {
+            @Override
+            public void onServiceStateChanged(int state) {
+                if(state == BluetoothState.STATE_CONNECTED) {
+                    Toast.makeText(ctx, getResources().getString(R.string.uzenet1), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            @Override
+            public void onDataReceived(byte[] data, String message) {
+                //itt kezelem le a kapott üzenetet
+                //amit itt megkapunk az tuti egy üzenet, szóval nem teljesen úgy kell lekezelni, mint Arduino-n
+
+                /*
+                csomag kezdés jel >
+                csomag lezáró jel |
+                adat szeparátor jel #
+
+                minden üzenetnek van csomagtípusa!!!
+                csomagtípusok:
+                kimenők:
+                0: tesztüzenet: üzenet
+                1: motorvezértlő: szög
+                2: motorvezérlő: sebesség
+                bejovok:
+                3: ultrahang: szög(fok), távolság(cm), irány (merre tart a radar)
+                    irányból 1 az alap, -1 ha visszafordul
+
+                tehát a csomag maximum 4 részből áll
+                típusa, plusz 3 adat
+
+                csomag szerkezete:
+                >csomagtípus#adat1#adat2#adatn|
+               */
+
+                String bejovoAdat = message;
+                //Log.d("Teszt",message);
+                int vanKezdo = bejovoAdat.indexOf('>');
+                int vanLezaro = bejovoAdat.indexOf('|');
+                while(vanLezaro > -1){
+                    if(vanKezdo > -1){
+                        //tömb létrehozása a csomagnak
+                        //annyi a hossza ahány a csomag maximálix elemszáma
+                        String[] csomag = new String[4];
+                        //van lezáró és kezdő jelünk is, daraboljuk fel az üzenetünket
+                        String feldolgozando = bejovoAdat.substring(vanKezdo+1, vanLezaro);
+                        //Log.d("Teszt",feldolgozando);
+                        int sorszam=0;
+                        int honnan=0;
+                        int elvalaszto= feldolgozando.indexOf('#',honnan);
+                        while(elvalaszto > -1){
+                            csomag[sorszam]=feldolgozando.substring(honnan,elvalaszto);
+                            //Log.d("Teszt",csomag[sorszam]);
+                            //a következő csomgarészhez
+                            sorszam++;
+                            honnan=elvalaszto+1;
+                            elvalaszto= feldolgozando.indexOf('#',honnan);
+                        }
+                        //ha nincs már elválasztó, akkor ez az utolsó csomagdarabka
+                        csomag[sorszam]=feldolgozando.substring(honnan, feldolgozando.length());
+                        //Log.d("Teszt",csomag[sorszam]);
+                        //levesszük a most feldolgozott bejovő adatot az elejéről
+                        bejovoAdat = bejovoAdat.substring(vanLezaro+1,bejovoAdat.length());
+                        //kivesszük a parancsot és annak megfelelően cselekszünk
+                        String mit;
+                        int ellenorizendo=-1; //mínusz értékeket biztosan nem fogok használni
+                        try {
+                            ellenorizendo = Integer.parseInt(csomag[0]);
+                        } catch (Exception e){}
+                        if(ellenorizendo>=0) {
+                            switch (ellenorizendo) {
+                                case 0:
+                                    //Ez csak teszt
+                                    break;
+                                case 3:
+                                    try {
+                                        //szög, távolság, és hogy éppen melyik irányba tart a radar
+                                        //Log.d("Teszt","Szög: "+Integer.parseInt(csomag[1])+" Táv: "+Integer.parseInt(csomag[2])+" Irány:"+Integer.parseInt(csomag[3]));
+                                        uv.UjErtek(Integer.parseInt(csomag[1]),Integer.parseInt(csomag[2]), Integer.parseInt(csomag[3]));
+                                    } catch (Exception e){}
+                                    break;
+                                default:
+                                    //Ekkor hiba van
+                                    break;
+                            }
+                        }
+                    } else {
+                        //ha van lezáró jel, de kezdő nincs, akkor a csomag eleje elveszett
+                        //töröljük ki az első lezárójelig a bejövő adatot
+                        bejovoAdat=bejovoAdat.substring(vanLezaro+1,bejovoAdat.length());
+                    }
+                    //az új csomaghoz
+                    vanKezdo = bejovoAdat.indexOf('>');
+                    vanLezaro = bejovoAdat.indexOf('|');
+                }
+            }
+        });
+
+        blueToothCsatlakozas(ctx);
 
         angleTextView = (TextView)view.findViewById(R.id.angleTextView);
         speedTextView = (TextView)view.findViewById(R.id.speedTextView);
@@ -51,6 +186,12 @@ public class MainFragment extends Fragment {
             @Override
             public void onPositionChange(float x, float y, float deg) {
                 angleTextView.setText(Float.toString(Math.round(deg)) + "°");
+
+                //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
+                blueToothCsatlakozas(ctx);
+                //a szög elküldése bt-on
+                String s = ">1#"+Float.toString(Math.round(deg))+"|";
+                bt.send(s, false);
             }
 
             @Override
@@ -68,6 +209,12 @@ public class MainFragment extends Fragment {
             @Override
             public void onPositionChange(float x, float y, float deg) {
                 speedTextView.setText(Float.toString(Math.round(y * 100)));
+
+                //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
+                blueToothCsatlakozas(ctx);
+                //a sebesség elküldése bt-on
+                String s = ">2#"+Float.toString(Math.round(y * 100))+"|";
+                bt.send(s, false);
             }
 
             @Override
@@ -85,12 +232,40 @@ public class MainFragment extends Fragment {
     }
 
     private UltrasonicView uv;
-    private int testSzog;
+    private int testSzog, testTartomany, testSzogKezdet, testSzogVeg;
     private int irany;
     private Timer idozito;
     private TimerTask feladat;
     private int elteltIdo;
     private float testTav;
+
+    /*
+    Teszt adatok, amelyeket folyósón mértünk
+    medián szűrő alkalmazásával és visszhangot csökkentő hengerrel.
+    A Bluetooth kapcsolatot helyettesítjük a példában a teszt adatokkal.
+    */
+
+    //180 fokos teszttömb: 2*180 elem (0..179 --> 180 szög)
+    private int tavolsagok[] = {
+            1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+            21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+            41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,
+            61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,
+            81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,
+            101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,
+            121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,
+            141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,
+            161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,
+            1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+            21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,
+            41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,
+            61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,
+            81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,
+            101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,
+            121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,
+            141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,
+            161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179
+    };
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -98,9 +273,13 @@ public class MainFragment extends Fragment {
 
         //beazonosítjuk az ultrahang nézetet
         uv=(UltrasonicView) view.findViewById(R.id.ultrahang);
-
+        /*
+        //Ezek csak teszt adatok
         //megadjuk a teszteléshez a kezdeti értékeket
-        testSzog=0;
+        testSzogKezdet=30;
+        testSzog=30;
+        testTartomany=120;
+        testSzogVeg=testSzogKezdet+testTartomany-1;
         irany=1;
         elteltIdo=0;
 
@@ -116,12 +295,22 @@ public class MainFragment extends Fragment {
 
                 uv.UjErtek(testSzog,testTav, irany);
                 testSzog+=irany;
-                if(testSzog==119 || testSzog==0) irany=-irany;
+                if(testSzog==testSzogVeg || testSzog==testSzogKezdet){
+                    irany=-irany;
+                }
+                //ha azt akarjuk, ha megálljon, ha egyszer eljutott az egyik szélétől a másikig
+                //if(testSzog==180) feladat.cancel();
                 elteltIdo++;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
         // az időzítő elindítása
         idozito.schedule(feladat,0,50);
+        */
     }
 }

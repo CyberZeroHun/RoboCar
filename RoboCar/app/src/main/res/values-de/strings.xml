@@ -21,4 +21,8 @@
     <string name="erzekelesi_szog">Erfassungswinkel:</string>
     <string name="tavolsagosztok">Anzahl der Entfernungsteilern:</string>
     <string name="szogosztok">Anzahl der Winkelteilern:</string>
+    <string name="hiba1">Az eszköz nem támogatja a bluetooth-t!</string>
+    <string name="uzenet0">A RoboCarCZ keresése folyamatban...</string>
+    <string name="uzenet1">Sikeres csatlakozás a RoboCarCZ-re!</string>
+    <string name="uzenet2">Lecsatlakozás a RoboCarCZ-ről!</string>
 </resources>

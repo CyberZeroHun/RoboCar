@@ -23,4 +23,8 @@
     <string name="szogosztok">Number of angle dividers:</string>
     <string name="fegyver_szog">Turret angle: </string>
     <string name="kamera">Camera</string>
+    <string name="hiba1">Az eszköz nem támogatja a bluetooth-t!</string>
+    <string name="uzenet0">A RoboCarCZ keresése folyamatban...</string>
+    <string name="uzenet1">Sikeres csatlakozás a RoboCarCZ-re!</string>
+    <string name="uzenet2">Lecsatlakozás a RoboCarCZ-ről!</string>
 </resources>
