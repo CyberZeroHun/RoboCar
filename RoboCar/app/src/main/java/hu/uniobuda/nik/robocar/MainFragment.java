@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.security.Timestamp;
+import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -79,6 +81,9 @@ public class MainFragment extends Fragment {
             public void onServiceStateChanged(int state) {
                 if(state == BluetoothState.STATE_CONNECTED) {
                     Toast.makeText(ctx, getResources().getString(R.string.uzenet1), Toast.LENGTH_SHORT).show();
+                    //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                    //bt.stopAutoConnect();
+                    //bt.cancelDiscovery();
                 }
             }
         });
@@ -189,9 +194,13 @@ public class MainFragment extends Fragment {
 
                 //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
                 blueToothCsatlakozas(ctx);
+                //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                //bt.stopAutoConnect();
+                //bt.cancelDiscovery();
                 //a szög elküldése bt-on
                 String s = ">1#"+Float.toString(Math.round(deg))+"|";
                 bt.send(s, false);
+                //Log.d("KULD", Calendar.getInstance().getTime().toString());
             }
 
             @Override
@@ -212,9 +221,13 @@ public class MainFragment extends Fragment {
 
                 //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
                 blueToothCsatlakozas(ctx);
+                //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                //bt.stopAutoConnect();
+                //bt.cancelDiscovery();
                 //a sebesség elküldése bt-on
                 String s = ">2#"+Float.toString(Math.round(y * 100))+"|";
                 bt.send(s, false);
+                //Log.d("KULD", Calendar.getInstance().getTime().toString());
             }
 
             @Override
@@ -231,19 +244,17 @@ public class MainFragment extends Fragment {
         return view;
     }
 
-    private UltrasonicView uv;
+    /*
+    Teszt adatok, amelyeket folyósón mértünk
+    medián szűrő alkalmazásával és visszhangot csökkentő hengerrel.
+    A Bluetooth kapcsolatot helyettesítjük a példában a teszt adatokkal.
+
     private int testSzog, testTartomany, testSzogKezdet, testSzogVeg;
     private int irany;
     private Timer idozito;
     private TimerTask feladat;
     private int elteltIdo;
     private float testTav;
-
-    /*
-    Teszt adatok, amelyeket folyósón mértünk
-    medián szűrő alkalmazásával és visszhangot csökkentő hengerrel.
-    A Bluetooth kapcsolatot helyettesítjük a példában a teszt adatokkal.
-    */
 
     //180 fokos teszttömb: 2*180 elem (0..179 --> 180 szög)
     private int tavolsagok[] = {
@@ -266,6 +277,9 @@ public class MainFragment extends Fragment {
             141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,
             161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179
     };
+    */
+
+    private UltrasonicView uv;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {

@@ -277,18 +277,18 @@ public class UltrasonicView extends View {
 
         //körívek
         int tav_leptek=tavolsag/tavolsag_osztas;
-        for (int tv = 0; tv< TAV; tv+=tav_leptek){ //500cm : 0..500cm
+        for (int tv = 0; tv< tavolsag; tv+=tav_leptek){ //500cm : 0..500cm
             //mireFest.setColor(Color.GREEN);
             mireFest.setStrokeWidth(7f);
             //mireFest.setColor(ContextCompat.getColor(getContext(),R.color.dark_green));
             mireFest.setColor(vonalszin);
-            int param1 = (szel/2)*tv/ TAV;
-            int param2 = 2*(mag/2)*tv/ TAV; //ezt kétszer kell venni a dupla magasság miatt
+            int param1 = (szel/2)*tv/ tavolsag;
+            int param2 = 2*(mag/2)*tv/ tavolsag; //ezt kétszer kell venni a dupla magasság miatt
             RectF r = new RectF(param1+ VIZSZINTES_MARGO /2, param2+ FUGGOLEGES_MARGO, szel-param1+ VIZSZINTES_MARGO /2, 2*mag-param2+ FUGGOLEGES_MARGO); //2mag, hogy kitöltse a képet
             canvas.drawArc(r, kezdSzog, szog, false, mireFest);
             //méter szöveg
-            param1 = (szel/2)*(tv+tav_leptek)/ TAV; //azért kell +100 mert a következő léptékhez tartozik
-            param2 = 2*(mag/2)*(tv+tav_leptek)/ TAV;
+            param1 = (szel/2)*(tv+tav_leptek)/ tavolsag; //azért kell +100 mert a következő léptékhez tartozik
+            param2 = 2*(mag/2)*(tv+tav_leptek)/ tavolsag;
             mireFest.setStrokeWidth(2f);
             mireFest.setColor(szovegszin);
             double parameter = kezdSzog * Math.PI / 180;
@@ -322,8 +322,8 @@ public class UltrasonicView extends View {
             mireFest2.setColor(mertvonalszin);
             //double parameter = (180+i+30) * Math.PI / 180;
             double parameter = (i+kezdSzog) * Math.PI / 180;
-            float stopX = (float) (szel/2 + (adatok.get(i)/ TAV)*szel/2 * Math.cos(parameter));
-            float stopY = (float) (mag + (adatok.get(i)/ TAV)*mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
+            float stopX = (float) (szel/2 + (adatok.get(i)/ tavolsag)*szel/2 * Math.cos(parameter));
+            float stopY = (float) (mag + (adatok.get(i)/ tavolsag)*mag * Math.sin(parameter)); //(mag/2)*2, azaz mag kell, mert fent az eltolás miatt 2mag van
             pontok.set(i, new Point((int) stopX, (int) stopY));
             canvas.drawLine(szel / 2 + VIZSZINTES_MARGO / 2, mag + FUGGOLEGES_MARGO, stopX + VIZSZINTES_MARGO / 2, stopY+ FUGGOLEGES_MARGO, mireFest2);
         }

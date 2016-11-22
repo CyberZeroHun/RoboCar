@@ -32,5 +32,7 @@ dependencies {
     compile project(':joystick')
     compile project(':ultrasonic')
 	//bluetooth
-	compile 'com.akexorcist:bluetoothspp:1.0.0'
+	//compile 'com.akexorcist:bluetoothspp:1.0.0'
+    compile fileTree(include: ['*.jar'], dir: '../bluetooth')
+    compile project(path: ':bluetooth')
 }

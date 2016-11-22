@@ -10,11 +10,23 @@ int szog = kezdo;
 int vezerlojel = 7; //D7 PWM servo vezerlojel Megán
 Servo srv;
 
+//motor miatt
+int Men_A = 8;
+int MA_1 = 9;
+int MA_2 = 10;
+int MB_1 = 12;
+int MB_2 = 11;
+int Men_B = 13;
+int sebesseg=0;
+bool eloreVhatra=true; //true az előre
+
 //ultrahang beállítások
 #define TRIGGER 6 //trigger láb D6 Megán
 #define ECHO 5 //echo láb D5 Megán
-#define MAX_TAV 450
+#define MAX_TAV 200 //most azt szeretném, hogy 2 méterre lásson el
 NewPing sonar(TRIGGER, ECHO, MAX_TAV);
+
+
 
 void setup() {
   //Konfighoz:
@@ -25,7 +37,57 @@ void setup() {
   Serial3.begin(9600);//olvasó BT-ról
 
   //servo felcsatolása
-  srv.attach(vezerlojel); 
+  srv.attach(vezerlojel);
+
+  //motor miatt
+  //pwm sebesség A és B motor
+  pinMode(Men_A,OUTPUT);
+  pinMode(Men_B,OUTPUT);
+  //high/low forgás irány szabályozók
+  pinMode(MA_1,OUTPUT);
+  pinMode(MA_2,OUTPUT);  
+  pinMode(MB_1,OUTPUT);
+  pinMode(MB_2,OUTPUT);
+}
+
+//sebesség 0-255
+void balSebesseg(int seb){
+  analogWrite(Men_A,seb);
+}
+
+//sebesség 0-255
+void jobbSebesseg(int seb){
+  analogWrite(Men_B,seb);
+}
+
+void balElore(){
+  digitalWrite(MA_1,HIGH);
+  digitalWrite(MA_2,LOW);
+}
+
+void jobbElore(){
+  digitalWrite(MB_1,HIGH);
+  digitalWrite(MB_2,LOW);
+}
+
+void balHatra(){
+  digitalWrite(MA_1,LOW);
+  digitalWrite(MA_2,HIGH);
+}
+
+void jobbHatra(){
+  digitalWrite(MB_1,LOW);
+  digitalWrite(MB_2,HIGH);
+}
+
+void balAllj(){
+  digitalWrite(MA_1,LOW);
+  digitalWrite(MA_2,LOW);
+}
+
+void jobbAllj(){
+  digitalWrite(MB_1,LOW);
+  digitalWrite(MB_2,LOW);
 }
 
 //a beérkező adatok figyelése
@@ -43,7 +105,6 @@ void BT_beerkezo(){
     ezen a TX0-ás porton írunk a BT-ra is.
     */
     //Serial.println(s);
-       
   }
 
   /*
@@ -95,6 +156,8 @@ void BT_beerkezo(){
       bejovoAdat = bejovoAdat.substring(vanLezaro+1,bejovoAdat.length());
       //kivesszük a parancsot és annak megfelelően cselekszünk
       String mit;
+      int seged=0;
+      String teszt="";
       switch((csomag[0]).toInt()){
         case 0:
           mit=csomag[1];
@@ -106,6 +169,20 @@ void BT_beerkezo(){
             Serial.println("ERROR");
         break;
         case 1:
+        break;
+        case 2:
+          mit=csomag[1];          
+          seged = mit.toInt();
+          if(seged>=0){
+            eloreVhatra=true;
+          } else {
+            eloreVhatra=false;
+          }
+          seged=abs(seged);
+          //itt csak egy globális értéket adunk a sebességnek, de nem itt motorozunk        
+          sebesseg=map(seged,0,100,0,255);
+          teszt=String(seged)+":"+String(sebesseg);
+          Serial.println(teszt);
         break;
         default:
           Serial.println("ERROR");
@@ -170,5 +247,31 @@ void UltraServ(){
 
 void loop() {
   BT_beerkezo();
-  UltraServ();
+  //TODO: ideiglenesen kikapcsoltam a távirányítósautó leteszteléséhez
+  //UltraServ();
+
+  //a távirányítós autó tesztelése
+  if(eloreVhatra){
+    balElore();
+    jobbElore();    
+  } else {
+    balHatra();
+    jobbHatra();
+  }
+  if(sebesseg==0){
+    balAllj();
+    jobbAllj();
+  }
+  
+  balSebesseg(sebesseg);
+  jobbSebesseg(sebesseg);
+
+  //azért várakoztatunk 1mp-et, hogy addig ezzel a sebességgel forogjon a kerék
+  //és azért töröljük a bejövö adatokat, mert ekközben a sok forgalom miatt felgyülhetett a sok adat
+  //delay(100);
+  //bejovoAdat="";
+   //miután ment amennyit akartuk, leállítjuk
+   //sebesseg=0;          
+   //balAllj();
+   //jobbAllj();
 }
