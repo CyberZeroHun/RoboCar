@@ -2,10 +2,17 @@
 #include <Servo.h>
 #include <NewPing.h>
 
+//bluetooth beállítás
+#define BUFFERSIZE 22 //byte
+#define BTTIMEOUT 20 //ms
+//az alábbi műveletre azért van szükség, mert feltorlódnak a parancsok, ha sokat dolgozunk fel egyszerre
+#define BTMAXCOMMAND 3 //hány darab külső parancs után ürítse ki a bejovoAdatot
+
 //servo beállítások
 int view = 120; //max 180;
 int kezdo = 90 - (view/2); //a max 180-nál: 180/2=90 //most 30
 int veg = kezdo + view; //most 150
+int irany=1;
 int szog = kezdo;
 int vezerlojel = 7; //D7 PWM servo vezerlojel Megán
 Servo srv;
@@ -34,7 +41,8 @@ void setup() {
   //Serial3.begin(38400);
   //Alapjáraton:
   Serial.begin(9600);//író BT-ra
-  Serial3.begin(9600);//olvasó BT-ról
+  Serial3.begin(9600);//olvasó BT-ról  
+  Serial3.setTimeout(BTTIMEOUT);//eddig várunk adatra a bluetooth-ról maximum, utána megszakítjuk
 
   //servo felcsatolása
   srv.attach(vezerlojel);
@@ -93,10 +101,27 @@ void jobbAllj(){
 //a beérkező adatok figyelése
 String bejovoAdat;
 void BT_beerkezo(){
+  //akár jön adat a sebességgel kapcsolatban, akár nem nullázzuk ki
+  //így ha nem jön új adat, akkor nem ragad be a régi és nem megy magától a ketyere
+  sebesseg=0;
+  
 // put your main code here, to run repeatedly:
-  while(Serial3.available()>0){
-    String s = Serial3.readString();
-    bejovoAdat += s;
+  //ez addig futott, amíg csak volt adat
+  //while(Serial3.available()>0){
+  //most csak egyszer olvas be a lejárati időig, ami alapértéken 1másodperc lenne (átállítottam 200ms-ra), vagy ha már nincs több adat
+  if(Serial3.available()>0){    
+    //ez most addig olvas amíg timeout-ra nem fut, de ezt most lecseréljük
+    //String s = Serial3.readString();
+    //addig olvas, amíg a mi üzenetstruktúránk szerinti üzenetvége jelet nem kap, vagy timeot-ra nem fut
+    //de ez lecsípi az üzenet végéről a vége jelet, így ezt sem jó számunkra
+    //String s = Serial3.readStringUntil('|');
+    //10 byte adatot olvasunk be, vagy timeout-ig
+    char buf[BUFFERSIZE];
+    Serial3.readBytes(buf,BUFFERSIZE);
+    for(int j=0; j<BUFFERSIZE;j++){
+      if(buf[j]!='\0') bejovoAdat += buf[j];
+    }
+    //bejovoAdat += s;
     ////Serial.println("Received from RX3: " + s);
     
     /*
@@ -104,9 +129,14 @@ void BT_beerkezo(){
     egyben vissza is küldeni a BT-nak amit kapott, mert
     ezen a TX0-ás porton írunk a BT-ra is.
     */
+    //tesztelésnél itt kibukik, hogy néha szemét adat is átjön, de ezzel most nem foglalkozunk, mert
+    //amint utána átjön egy jó adat a szemét adat is kitörlődik a behovoAdat változóból
     //Serial.println(s);
   }
 
+  //tesztelés szempontjából
+  //Serial.println(bejovoAdat);
+  
   /*
    csomag kezdés jel >
    csomag lezáró jel |
@@ -130,7 +160,12 @@ void BT_beerkezo(){
    */
   int vanKezdo = bejovoAdat.indexOf('>');
   int vanLezaro = bejovoAdat.indexOf('|');
-  while(vanLezaro > -1){    
+  //felgyűlnek az adatok, ha addig dolgozzuk fel a parancsokat, amíg vannak
+  //while(vanLezaro > -1){    
+  //sajnos így nem lehet real time, addig dolgozzunkk, amíg van parancs, de maximum 5 parancsig
+  //utánna ürítsük ki a bejovoAdat változót
+  int hanyadikParancs=0;
+  while((vanLezaro > -1) && (hanyadikParancs<= BTMAXCOMMAND)){
     if(vanKezdo > -1){
       //tömb létrehozása a csomagnak
       //annyi a hossza ahány a csomag maximálix elemszáma
@@ -181,13 +216,14 @@ void BT_beerkezo(){
           seged=abs(seged);
           //itt csak egy globális értéket adunk a sebességnek, de nem itt motorozunk        
           sebesseg=map(seged,0,100,0,255);
-          teszt=String(seged)+":"+String(sebesseg);
-          Serial.println(teszt);
+          //teszt=String(seged)+":"+String(sebesseg);
+          //Serial.println(teszt);
         break;
         default:
           Serial.println("ERROR");
         break;        
-      }     
+      }
+      hanyadikParancs++;     
     } else {
       //ha van lezáró jel, de kezdő nincs, akkor a csomag eleje elveszett      
       //töröljük ki az első lezárójelig a bejövő adatot
@@ -195,8 +231,17 @@ void BT_beerkezo(){
     }
     //az új csomaghoz
     vanKezdo = bejovoAdat.indexOf('>');
-    vanLezaro = bejovoAdat.indexOf('|');
+    vanLezaro = bejovoAdat.indexOf('|');    
   }
+
+  //ha túl sok adat van a bejovoAdatokban, akkor késleltetés alakul ki és tovább működik a motor, mint kéne
+  //ezért ha több adat maradt feldolgozás után a bejovoAdatokban, mint amennyit a bufferben most ujonnan beolvastunk
+  //ami csak akkor állhat fent, ha az új beolvasott adatokkal sem tudtunk értelmezni egy parancsot sem a szövegben
+  //akkor kiürítjük a bejovoAdatokat
+  //if(bejovoAdat.length()>BUFFERSIZE) bejovoAdat="";
+  //mindenféleképpen ürítsünk, mert közben állítottunk be maximum parancsok számát
+  bejovoAdat="";
+  
   /*
   Ez akkor kellene, ha a soros monitorból szeretnénk írni a BT-nak.
   */
@@ -213,42 +258,39 @@ void BT_beerkezo(){
 //ultrahang és servo lekezelése
 void UltraServ(){
   unsigned int tav;
+
+  srv.write(szog);
+  delay(2);
+  tav = sonar.ping_median();
+  delay(145); //4*29    
+
+  //a telefonon pont fordítva van a megjelenítés, ezért a szöget tükröznünk kell a skálán
+  //és ezért az irány is fordított -irany
+  //int szog2=szog;
+  int szog2=180-szog;
   
-  int irany=1;  
-  for(szog=kezdo;szog<=veg;szog++){
-    srv.write(szog);
-    delay(2);
-    tav = sonar.ping_median();
-    delay(145); //4*29    
+  //küldés BT-on    
+  Serial.println(">3#"+(String)(szog2)+"#"+(String)(tav/US_ROUNDTRIP_CM)+"#"+(-irany)+"|");
 
-    //a telefonon pont fordítva van a megjelenítés, ezért a szöget tükröznünk kell a skálán
-    //és ezért az irány is fordított -irany
-    //int szog2=szog;
-    int szog2=180-szog;
-    
-    //küldés BT-on    
-    Serial.println(">3#"+(String)(szog2)+"#"+(String)(tav/US_ROUNDTRIP_CM)+"#"+(-irany)+"|");
-  }
-  irany=-irany;
-  for(szog=veg;szog>=kezdo;szog--){
-    srv.write(szog);
-    delay(2);
-    tav = sonar.ping_median();
-    delay(145); //4*29
+  if(irany==1){
+    //növelem a szöget a következő iterációhoz
+    szog++;
 
-    //a telefonon pont fordítva van a megjelenítés, ezért a szöget tükröznünk kell a skálán
-    //int szog2=szog;
-    int szog2=180-szog;
-    
-    //küldés BT-on
-    Serial.println(">3#"+(String)(szog2)+"#"+(String)(tav/US_ROUNDTRIP_CM)+"#"+(-irany)+"|");
+    //ha elértük a szélső határt akkor a következő iterációnál irányt váltunk
+    if(szog==veg+1) irany=-irany;
+  } else {
+    //csökkentem a szöget a következő iterációhoz
+    szog--;
+
+    //ha elértük a szélső határt akkor a következő iterációnál irányt váltunk
+    if(szog==kezdo-1) irany=-irany;
   }
 }
 
 void loop() {
+  UltraServ();
+  
   BT_beerkezo();
-  //TODO: ideiglenesen kikapcsoltam a távirányítósautó leteszteléséhez
-  //UltraServ();
 
   //a távirányítós autó tesztelése
   if(eloreVhatra){
@@ -257,15 +299,15 @@ void loop() {
   } else {
     balHatra();
     jobbHatra();
-  }
+  }  
   if(sebesseg==0){
     balAllj();
     jobbAllj();
   }
-  
+
   balSebesseg(sebesseg);
   jobbSebesseg(sebesseg);
-
+  
   //azért várakoztatunk 1mp-et, hogy addig ezzel a sebességgel forogjon a kerék
   //és azért töröljük a bejövö adatokat, mert ekközben a sok forgalom miatt felgyülhetett a sok adat
   //delay(100);
