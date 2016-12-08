@@ -29,13 +29,17 @@ float balMotorDifferencia = 1.0;
 float jobbMotorDifferencia = 1.12;
 bool eloreVhatra = true; //true az előre
 
+//encoder tárcsa
+int MEGSZ_1 = 20;
+int MEGSZ_2 = 21;
+int balJelSzam = 0;
+int jobbJelSzam = 0;
+
 //ultrahang beállítások
 #define TRIGGER 6 //trigger láb D6 Megán
 #define ECHO 5 //echo láb D5 Megán
 #define MAX_TAV 200 //most azt szeretném, hogy 2 méterre lásson el
 NewPing sonar(TRIGGER, ECHO, MAX_TAV);
-
-
 
 void setup() {
   //Konfighoz:
@@ -58,10 +62,25 @@ void setup() {
   pinMode(MA_2, OUTPUT);
   pinMode(MB_1, OUTPUT);
   pinMode(MB_2, OUTPUT);
+
+  //encoder miatt
+  pinMode(MEGSZ_1, INPUT);
+  pinMode(MEGSZ_2, INPUT);
+  attachInterrupt(digitalPinToInterrupt(MEGSZ_1), balJelSzam++, FALLING);
+  attachInterrupt(digitalPinToInterrupt(MEGSZ_2), jobbJelSzam++, FALLING);
+}
+
+//jobbat hányszor kell felszorozni a balhoz
+void sebessegDiff(){
+  float hanyados= balJelSzam / jobbJelSzam;
+  balJelSzam = 0;
+  jobbJelSzam = 0;
+  //balMotorDifferencia = 1.0;
+  jobbMotorDifferencia = hanyados;
 }
 
 //sebesség 0-255
-void balSebesseg(int seb) {
+void balSebesseg(int seb) {  
   seb = (float)(85 * balMotorDifferencia);
   analogWrite(Men_A, seb);
 }
@@ -309,6 +328,7 @@ void loop() {
     jobbAllj();
   }
 
+  sebessegDiff();
   balSebesseg(sebesseg);
   jobbSebesseg(sebesseg);
 
