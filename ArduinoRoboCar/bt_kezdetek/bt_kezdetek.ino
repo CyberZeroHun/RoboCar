@@ -26,7 +26,7 @@ int MB_2 = 11;
 int Men_B = 13;
 int sebesseg = 0;
 float balMotorDifferencia = 1.0;
-float jobbMotorDifferencia = 1.12;
+float jobbMotorDifferencia = 1.13;
 bool eloreVhatra = true; //true az előre
 
 //encoder tárcsa
@@ -66,28 +66,46 @@ void setup() {
   //encoder miatt
   pinMode(MEGSZ_1, INPUT);
   pinMode(MEGSZ_2, INPUT);
-  attachInterrupt(digitalPinToInterrupt(MEGSZ_1), balJelSzam++, FALLING);
-  attachInterrupt(digitalPinToInterrupt(MEGSZ_2), jobbJelSzam++, FALLING);
+  attachInterrupt(digitalPinToInterrupt(MEGSZ_1), balNovel, FALLING);
+  attachInterrupt(digitalPinToInterrupt(MEGSZ_2), jobbNovel, FALLING);
+}
+
+void balNovel() {
+  Serial.print("Bal novel");
+  balJelSzam++;
+}
+
+void jobbNovel() {
+  Serial.print("Jobb novel");
+  jobbJelSzam++;
 }
 
 //jobbat hányszor kell felszorozni a balhoz
 void sebessegDiff(){
   float hanyados= balJelSzam / jobbJelSzam;
-  balJelSzam = 0;
-  jobbJelSzam = 0;
+  /*char outstr[15];
+  dtostrf(hanyados, 7, 3, outstr);
+  Serial.write(outstr);
+  */
+  Serial.print("jobb jelszam: ");
+  Serial.print(jobbJelSzam);
+  Serial.print("\n");
+  
+  //balJelSzam = 0;
+  //jobbJelSzam = 0;
   //balMotorDifferencia = 1.0;
-  jobbMotorDifferencia = hanyados;
+  //jobbMotorDifferencia = hanyados;
 }
 
 //sebesség 0-255
 void balSebesseg(int seb) {  
-  seb = (float)(85 * balMotorDifferencia);
+  seb = (float)(100 * balMotorDifferencia);
   analogWrite(Men_A, seb);
 }
 
 //sebesség 0-255
 void jobbSebesseg(int seb) {
-  seb = (float)(85 * jobbMotorDifferencia);
+  seb = (float)(100 * jobbMotorDifferencia);
   analogWrite(Men_B, seb);
 }
 
@@ -330,6 +348,7 @@ void loop() {
 
   sebessegDiff();
   balSebesseg(sebesseg);
+  
   jobbSebesseg(sebesseg);
 
   //azért várakoztatunk 1mp-et, hogy addig ezzel a sebességgel forogjon a kerék
