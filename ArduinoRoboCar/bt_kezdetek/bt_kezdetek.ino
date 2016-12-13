@@ -26,10 +26,14 @@ int MB_2 = 11;
 int Men_B = 13;
 int sebesseg = 0;
 float balMotorDifferencia = 1.0;
-float jobbMotorDifferencia = 1.13;
-bool eloreVhatra = true; //true az előre
-bool balKanyar = false; //balra kell-e kanyarodni
-bool jobbKanyar = false; //jobbra kell-e kanyarodni
+float jobbMotorDifferencia = 1.07; //1.03;
+bool eloreVhatra = true; //true az előre (joystick)
+bool balKanyar = false; //balra kell-e kanyarodni (joystick)
+bool jobbKanyar = false; //jobbra kell-e kanyarodni (joystick)
+bool eloreLeptet = false; //előre gomb
+bool hatraLeptet = false; //hátra gomb
+bool balraForgat = false; //balra gomb
+bool jobbraForgat = false; //jobbra gomb
 
 //encoder tárcsa
 int MEGSZ_1 = 20;
@@ -100,22 +104,26 @@ void sebessegDiff(){
 //sebesség 0-255
 void balSebesseg(int seb) {  
   seb = (float)(seb * balMotorDifferencia);
+  if(seb>255) seb=255;
   analogWrite(Men_A, seb);
 }
 
 //sebesség 0-255
 void jobbSebesseg(int seb) {
   seb = (float)(seb * jobbMotorDifferencia);
+  if(seb>255) seb=255;
   analogWrite(Men_B, seb);
 }
 
 //alapértékként 100-ra belőjük teszteléshez
 void balSebesseg() {  
   float seb = (float)(100 * balMotorDifferencia);
+  if(seb>255) seb=255;
   analogWrite(Men_A, seb);
 }
 void jobbSebesseg() {
   float seb = (float)(100 * jobbMotorDifferencia);
+  if(seb>255) seb=255;
   analogWrite(Men_B, seb);
 }
 
@@ -199,6 +207,10 @@ void BT_beerkezo() {
     0: tesztüzenet: üzenet
     1: motorvezérlő: szög
     2: motorvezérlő: sebesség
+    4: menny előre ~ 42cm-t: nincs paraméter
+    5: menny hátra ~ 42cm-t: nincs paraméter
+    6: fordulj balra ~ 90°-ot: nincs paraméter
+    7: fordulj jobbra ~ 90°-ot: nincs paraméter
     kimenok:
     3: ultrahang: szög(fok), távolság(cm), irány (merre tart a radar)
     irányból 1 az alap, -1 ha visszafordul
@@ -278,6 +290,18 @@ void BT_beerkezo() {
           //teszt=String(seged)+":"+String(sebesseg);
           //Serial.println(teszt);
           break;
+        case 4:
+          eloreLeptet=true;
+          break;
+        case 5:
+          hatraLeptet=true;
+          break;
+        case 6:
+          balraForgat=true;
+          break;
+        case 7:
+          jobbraForgat=true;
+          break;
         default:
           Serial.println("ERROR");
           break;
@@ -346,11 +370,7 @@ void UltraServ() {
   }
 }
 
-void loop() {
-  UltraServ();
-
-  BT_beerkezo();
-
+void MotorJoystick() {
   //a távirányítós autó tesztelése
   if (eloreVhatra) {
     balElore();
@@ -401,4 +421,61 @@ void loop() {
   //sebesseg=0;
   //balAllj();
   //jobbAllj();
+}
+
+void MotorGombok() {
+  if(eloreLeptet){
+    balElore();
+    jobbElore();
+    balSebesseg(150);  
+    jobbSebesseg(150);
+    delay(800);
+    balAllj();
+    jobbAllj();
+    //visszaállítás alaphelyzetbe
+    eloreLeptet=false;
+  }
+  if(hatraLeptet){
+    balHatra();
+    jobbHatra();
+    balSebesseg(150);  
+    jobbSebesseg(150);
+    delay(1000);
+    balAllj();
+    jobbAllj();
+    //visszaállítás alaphelyzetbe
+    hatraLeptet=false;
+  }
+  if(balraForgat){
+    balHatra();
+    jobbElore();    
+    balSebesseg(110);  
+    jobbSebesseg(110);
+    delay(950);
+    balAllj();
+    jobbAllj();
+    //visszaállítás alaphelyzetbe
+    balraForgat=false;
+  }
+  if(jobbraForgat){
+    balElore();
+    jobbHatra();    
+    balSebesseg(110);  
+    jobbSebesseg(110);
+    delay(750);
+    balAllj();
+    jobbAllj();
+    //visszaállítás alaphelyzetbe
+    jobbraForgat=false;
+  }
+}
+
+void loop() {
+  UltraServ();
+
+  BT_beerkezo();
+
+  MotorJoystick();
+
+  MotorGombok(); 
 }
