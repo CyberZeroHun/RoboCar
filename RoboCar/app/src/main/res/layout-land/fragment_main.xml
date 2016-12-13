@@ -17,44 +17,6 @@
         />
 
 
-    <TextView
-        android:id="@+id/angleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/cim"
-        android:textColor="@color/colorAlap"
-        android:textSize="16sp"/>
-
-    <TextView
-        android:id="@+id/speedTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/cim"
-        android:textColor="@color/colorAlap"
-        android:textSize="16sp"/>
-
-    <hu.uniobuda.nik.robocar.ultrasonic.UltrasonicView
-        android:id="@+id/ultrahang"
-        android:layout_width="290dp"
-        android:layout_height="200dp"
-        android:background="@color/black"
-        custom:korvonal_szin="@color/colorAlap"
-        custom:mert_vonal_szin="@color/colorVilagosSzurke"
-        custom:mutato_haromszog_szin="@color/transp_blue"
-        custom:mutato_szin="@color/blue"
-        custom:szog="120"
-        custom:szog_osztok="6"
-        custom:szoveg_szin="@color/colorAlapSotet"
-        custom:tavolsag="200"
-        custom:tavolsag_osztok="4"
-        custom:vonal_szin="@color/colorHangsulyos"
-        android:layout_below="@+id/cim"
-        android:layout_centerHorizontal="true"/>
-
-
     <hu.uniobuda.nik.joystick.Joystick
         android:id="@+id/joystick_1"
         android:layout_width="190dp"
@@ -89,4 +51,56 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <hu.uniobuda.nik.joystick.ArrowKeys
+        android:id="@+id/vezerlo"
+        android:layout_width="180dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/cim"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" >
+
+    </hu.uniobuda.nik.joystick.ArrowKeys>
+
+    <TextView
+        android:id="@+id/angleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nullfok"
+        android:textColor="@color/colorAlap"
+        android:textSize="16sp"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/cim"
+        android:layout_toEndOf="@+id/cim" />
+
+    <TextView
+        android:id="@+id/speedTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nullspeed"
+        android:textColor="@color/colorAlap"
+        android:textSize="16sp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <hu.uniobuda.nik.robocar.ultrasonic.UltrasonicView
+        android:id="@+id/ultrahang"
+        android:layout_width="300dp"
+        android:layout_height="170dp"
+        android:background="@color/black"
+        custom:korvonal_szin="@color/colorAlap"
+        custom:mert_vonal_szin="@color/colorVilagosSzurke"
+        custom:mutato_haromszog_szin="@color/transp_blue"
+        custom:mutato_szin="@color/blue"
+        custom:szog="120"
+        custom:szog_osztok="6"
+        custom:szoveg_szin="@color/colorAlapSotet"
+        custom:tavolsag="200"
+        custom:tavolsag_osztok="4"
+        custom:vonal_szin="@color/colorHangsulyos"
+        android:layout_above="@+id/angleTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="13dp" />
 </RelativeLayout>

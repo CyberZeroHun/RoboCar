@@ -35,5 +35,5 @@ dependencies {
     //compile 'com.akexorcist:bluetoothspp:1.0.0'
     compile fileTree(include: ['*.jar'], dir: '../bluetooth')
     compile project(path: ':bluetooth')
-    compile project(path: ':map')
+    //compile project(path: ':map')
 }

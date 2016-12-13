@@ -25,7 +25,7 @@ public interface GlobalisKonstansok {
     public final static int JELOLO_HAROMSZOG_MERETE = 10;
 
     //pozícionoálást segítő margók és eltolások
-    public final static int VIZSZINTES_MARGO =100;
+    public final static int VIZSZINTES_MARGO =170;
     public final static int FUGGOLEGES_MARGO =130;
     public final static int SZOVEG_VIZSZINTES_OFFSET =60;
     public final static int SZOVEG_FUGGOLEGES_OFFSET =70;

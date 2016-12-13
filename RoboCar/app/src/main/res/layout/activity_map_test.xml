@@ -12,21 +12,12 @@
     tools:context="hu.uniobuda.nik.robocar.MapTestActivity"
     >
 
-
-    <hu.uniobuda.nik.joystick.ArrowKeys
-        android:id="@+id/arrow_keys"
-        android:layout_width="100dp"
-        android:layout_height="100dp"/>
-
     <!--
     <hu.uniobuda.nik.map.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
-
-
-
 
     </hu.uniobuda.nik.map.MapView>
 -->

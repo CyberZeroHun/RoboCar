@@ -18,6 +18,8 @@ import java.util.TimerTask;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
+import hu.uniobuda.nik.joystick.ArrowKeys;
+import hu.uniobuda.nik.joystick.OnArrowKeyClickListener;
 import hu.uniobuda.nik.robocar.ultrasonic.UltrasonicView;
 import hu.uniobuda.nik.joystick.Joystick;
 import hu.uniobuda.nik.joystick.JoystickEventListener;
@@ -52,6 +54,7 @@ public class MainFragment extends Fragment {
     private Joystick joystick2;
     private TextView angleTextView;
     private TextView speedTextView;
+    private ArrowKeys arrowControl;
 
     @Nullable
     @Override
@@ -105,6 +108,10 @@ public class MainFragment extends Fragment {
                 0: tesztüzenet: üzenet
                 1: motorvezértlő: szög
                 2: motorvezérlő: sebesség
+                4: menny előre ~ 42cm-t: nincs paraméter
+                5: menny hátra ~ 42cm-t: nincs paraméter
+                6: fordulj balra ~ 90°-ot: nincs paraméter
+                7: fordulj jobbra ~ 90°-ot: nincs paraméter
                 bejovok:
                 3: ultrahang: szög(fok), távolság(cm), irány (merre tart a radar)
                     irányból 1 az alap, -1 ha visszafordul
@@ -240,6 +247,52 @@ public class MainFragment extends Fragment {
 
             }
         });
+
+        arrowControl = (ArrowKeys) view.findViewById(R.id.vezerlo);
+
+        arrowControl.setOnArrowButtonClickListener(new OnArrowKeyClickListener() {
+            @Override
+            public void onClick(byte direction) {
+                if (direction == ArrowKeys.DIRECTION_UP) {
+                    //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
+                    blueToothCsatlakozas(ctx);
+                    //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                    //bt.stopAutoConnect();
+                    //bt.cancelDiscovery();
+                    //a előre léptetés elküldése bt-on
+                    String s = ">4|";
+                    bt.send(s, false);
+                } else if (direction == ArrowKeys.DIRECTION_DOWN) {
+                    //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
+                    blueToothCsatlakozas(ctx);
+                    //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                    //bt.stopAutoConnect();
+                    //bt.cancelDiscovery();
+                    //a hátra léptetés elküldése bt-on
+                    String s = ">5|";
+                    bt.send(s, false);
+                } else if (direction == ArrowKeys.DIRECTION_LEFT) {
+                    //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
+                    blueToothCsatlakozas(ctx);
+                    //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                    //bt.stopAutoConnect();
+                    //bt.cancelDiscovery();
+                    //a balra forgatás elküldése bt-on
+                    String s = ">6|";
+                    bt.send(s, false);
+                } else if (direction == ArrowKeys.DIRECTION_RIGHT) {
+                    //csatlakozzon, ha még nincs (ez most mindenféleképpen csatlakozik újra, majd javítjuk)
+                    blueToothCsatlakozas(ctx);
+                    //ezzel próbálunk gyorsítani, hogy ezt kikapcsoljuk
+                    //bt.stopAutoConnect();
+                    //bt.cancelDiscovery();
+                    //a jobbra forgatás elküldése bt-on
+                    String s = ">7|";
+                    bt.send(s, false);
+                }
+            }
+        });
+
         // To dismiss the dialog
         return view;
     }
