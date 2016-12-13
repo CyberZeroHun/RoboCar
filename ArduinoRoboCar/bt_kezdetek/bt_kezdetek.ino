@@ -28,6 +28,8 @@ int sebesseg = 0;
 float balMotorDifferencia = 1.0;
 float jobbMotorDifferencia = 1.13;
 bool eloreVhatra = true; //true az előre
+bool balKanyar = false; //balra kell-e kanyarodni
+bool jobbKanyar = false; //jobbra kell-e kanyarodni
 
 //encoder tárcsa
 int MEGSZ_1 = 20;
@@ -71,12 +73,10 @@ void setup() {
 }
 
 void balNovel() {
-  Serial.print("Bal novel");
   balJelSzam++;
 }
 
 void jobbNovel() {
-  Serial.print("Jobb novel");
   jobbJelSzam++;
 }
 
@@ -99,13 +99,23 @@ void sebessegDiff(){
 
 //sebesség 0-255
 void balSebesseg(int seb) {  
-  seb = (float)(100 * balMotorDifferencia);
+  seb = (float)(seb * balMotorDifferencia);
   analogWrite(Men_A, seb);
 }
 
 //sebesség 0-255
 void jobbSebesseg(int seb) {
-  seb = (float)(100 * jobbMotorDifferencia);
+  seb = (float)(seb * jobbMotorDifferencia);
+  analogWrite(Men_B, seb);
+}
+
+//alapértékként 100-ra belőjük teszteléshez
+void balSebesseg() {  
+  float seb = (float)(100 * balMotorDifferencia);
+  analogWrite(Men_A, seb);
+}
+void jobbSebesseg() {
+  float seb = (float)(100 * jobbMotorDifferencia);
   analogWrite(Men_B, seb);
 }
 
@@ -187,7 +197,7 @@ void BT_beerkezo() {
     csomagtípusok:
     bejovok:
     0: tesztüzenet: üzenet
-    1: motorvezértlő: szög
+    1: motorvezérlő: szög
     2: motorvezérlő: sebesség
     kimenok:
     3: ultrahang: szög(fok), távolság(cm), irány (merre tart a radar)
@@ -245,6 +255,14 @@ void BT_beerkezo() {
             Serial.println("ERROR");
           break;
         case 1:
+          mit = csomag[1];
+          seged = mit.toInt();
+          if (seged < 0) {
+            balKanyar = true;
+          } else if (seged > 0) {
+            jobbKanyar = true;
+          }
+          seged = abs(seged);
           break;
         case 2:
           mit = csomag[1];
@@ -341,15 +359,39 @@ void loop() {
     balHatra();
     jobbHatra();
   }
+
+  if(balKanyar){
+    balHatra();
+    jobbElore();
+    //beégetett sebességgel kanyarodunk
+    sebesseg=80;
+    //visszaállítás alaphelyzetbe
+    balKanyar=false;
+  }
+  if(jobbKanyar){
+    balElore();
+    jobbHatra();
+    //beégetett sebességgel kanyarodunk
+    sebesseg=80;
+    //visszaállítás alaphelyzetbe
+    jobbKanyar=false;
+  }
+  
   if (sebesseg == 0) {
     balAllj();
     jobbAllj();
   }
 
-  sebessegDiff();
-  balSebesseg(sebesseg);
-  
-  jobbSebesseg(sebesseg);
+  //az encoder tárcsák hibásan lettek felszerelve
+  //a tárcsa nem egyenletesen érzékel, így ezt a részt kihagyjuk, javítani kell
+  //sebessegDiff();
+
+  //mivel nincs sebességszabályozás a kerekeken, ezért az itt beállított értékekkel
+  //össze-vissza menne, így egy beállított alapértékkel hívjuk meg
+  //balSebesseg(sebesseg);  
+  //jobbSebesseg(sebesseg);
+  balSebesseg();  
+  jobbSebesseg();
 
   //azért várakoztatunk 1mp-et, hogy addig ezzel a sebességgel forogjon a kerék
   //és azért töröljük a bejövö adatokat, mert ekközben a sok forgalom miatt felgyülhetett a sok adat
