@@ -31,8 +31,9 @@ dependencies {
     compile 'com.android.support:design:23.3.0'
     compile project(':joystick')
     compile project(':ultrasonic')
-	//bluetooth
-	//compile 'com.akexorcist:bluetoothspp:1.0.0'
+    //bluetooth
+    //compile 'com.akexorcist:bluetoothspp:1.0.0'
     compile fileTree(include: ['*.jar'], dir: '../bluetooth')
     compile project(path: ':bluetooth')
+    compile project(path: ':map')
 }

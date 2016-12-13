@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="hu.uniobuda.nik.robocar">
+          package="hu.uniobuda.nik.robocar">
 
-	<!-- bluetooth jogok -->
-	<uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-	
+    <!-- bluetooth jogok -->
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_robocar"
@@ -18,24 +18,28 @@
         A SplashActivity-re kikényszerítjük az álló elrendezést.
         Hogy ne vegyen el helyet az ActionBar a SplashScreen-ből átállítjuk a Témát.
         -->
-        <activity android:name="hu.uniobuda.nik.robocar.SplashActivity"
+        <activity
+            android:name=".SplashActivity"
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:theme="@style/AlapTema.ActionBarNelkul">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
         <!-- Hogy programkódból a MainActivity-hez is hozzáférjünk fel kell itt venni. -->
-        <activity android:name="hu.uniobuda.nik.robocar.MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:configChanges="orientation"
-            android:screenOrientation="landscape"
             android:label="@string/app_name"
+            android:screenOrientation="landscape"
             android:theme="@style/AlapTema.ActionBarNelkul">
         </activity>
-
+        <activity android:name=".MapTestActivity" android:exported="true">
+        </activity>
     </application>
 
 </manifest>
