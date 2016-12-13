@@ -1,6 +1,8 @@
 //servo és ultrahang könyvtár
 #include <Servo.h>
 #include <NewPing.h>
+//wire könyvtár az IMU-hoz, megánál kötelezően a D20, D21 lábon van
+#include<Wire.h>
 
 //bluetooth beállítás
 #define BUFFERSIZE 22 //byte
@@ -36,10 +38,21 @@ bool balraForgat = false; //balra gomb
 bool jobbraForgat = false; //jobbra gomb
 
 //encoder tárcsa
-int MEGSZ_1 = 20;
-int MEGSZ_2 = 21;
+int MEGSZ_1 = 18; //20-on volt, ott működött, csak a Wire miatt át kellett rakni
+int MEGSZ_2 = 19; //22-en volt, ott működött, csak a Wire miatt át kellett rakni
 int balJelSzam = 0;
 int jobbJelSzam = 0;
+
+//IMU
+const int IMU=0x68; //az MPU6050 I2C címe
+int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ; //a gyorsulásmérő, a hőmérséklet és a gyroscope adatok
+#define ACC_OSZTO 16384.0 //az ACC és a GYRO közös rátájához
+#define GYRO_OSZTO 131.0  //az ACC és a GYRO közös rátájához
+#define RAD2DEG 57.295779 //radián fokra váltásához
+float Acc[2]; //tömbök az X és Y értékek számításához, nincs magnetométer ezért a Z-t nem tudjuk pontosan kiszámolni
+float Gyro[2];
+float Szogek[2];
+unsigned long ido; //az eltelt idő fontos a számításoknál
 
 //ultrahang beállítások
 #define TRIGGER 6 //trigger láb D6 Megán
@@ -74,6 +87,15 @@ void setup() {
   pinMode(MEGSZ_2, INPUT);
   attachInterrupt(digitalPinToInterrupt(MEGSZ_1), balNovel, FALLING);
   attachInterrupt(digitalPinToInterrupt(MEGSZ_2), jobbNovel, FALLING);
+
+  //imu miatt
+  Wire.begin();
+  Wire.beginTransmission(IMU);
+  Wire.write(0x6B);  // PWR_MGMT_1 regiszter
+  Wire.write(0);     // felébresztjük az IMU-t
+  Wire.endTransmission(true);
+  //az eltelt idő számításához
+  ido=millis();
 }
 
 void balNovel() {
@@ -470,6 +492,48 @@ void MotorGombok() {
   }
 }
 
+void imuAdatok(){
+  Wire.beginTransmission(IMU);
+  Wire.write(0x3B);  // a 0x3B (ACCEL_XOUT_H) regiszterrel indítunk
+  Wire.endTransmission(false);
+  // nincs mind a 14 regiszterre szükségünk csak 6-ra
+  //Wire.requestFrom(MPU,14,true);
+  Wire.requestFrom(IMU,6,true);    //mindegyik 2 regiszteres 3*2=6
+  AcX=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
+  AcY=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+  AcZ=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  //Serial.print(AcX);Serial.print(",");Serial.print(AcY);Serial.print(",");Serial.print(AcZ);Serial.print("\n");
+  
+  //a gyorsulásmérő számítások
+  Acc[1] = atan(-1*(AcX/ACC_OSZTO)/sqrt(pow((AcY/ACC_OSZTO),2) + pow((AcZ/ACC_OSZTO),2)))*RAD2DEG;
+  Acc[0] = atan((AcY/ACC_OSZTO)/sqrt(pow((AcX/ACC_OSZTO),2) + pow((AcZ/ACC_OSZTO),2)))*RAD2DEG;
+
+  Wire.beginTransmission(IMU);
+  Wire.write(0x43);  // a 0x3B (ACCEL_XOUT_H) regiszterrel folytatjuk
+  Wire.endTransmission(false);
+  Wire.requestFrom(IMU,4,true); //már csak 4 regiszterre van szükségünk
+  GyX=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+  GyY=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+
+  //ezt a 4 értéket nem használjuk fel
+  //Tmp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  //float homerseklet = Tmp/340.00+36.53); //ha fontos lenne a hőmérséklet
+  //GyZ=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+  //Serial.print(GyX);Serial.print(",");Serial.print(GyY);Serial.print(",");Serial.print(GyZ);Serial.print("\n");
+  delay(1000);
+  //a gyroscope számítások
+  Gyro[0] = GyX/GYRO_OSZTO;
+  Gyro[1] = GyY/GYRO_OSZTO;
+  //az eltelt idő számítása
+  double deltaT=(millis()-ido)/1000; //vagy vegyuk 0.010-nek (ha van delay 10 a végén és csak ez van a kódban //50 napig képes számolni mielőtt visszaesik 0-ra
+  ido=millis(); //aztán az időt nullázzuk le
+  Serial.print(deltaT);Serial.print("\n");
+  //a szögek számítása (roll és pitch
+  Szogek[0] = 0.98 *(Szogek[0]+Gyro[0]*deltaT) + 0.02*Acc[0]; //X
+  Szogek[1] = 0.98 *(Szogek[1]+Gyro[1]*deltaT) + 0.02*Acc[1]; //Y
+  //Serial.print("["); Serial.print(Szogek[0]); Serial.print(","); Serial.print(Szogek[1]);Serial.print("]"); Serial.print("\n");
+}
+
 void loop() {
   UltraServ();
 
@@ -477,5 +541,7 @@ void loop() {
 
   MotorJoystick();
 
-  MotorGombok(); 
+  MotorGombok();
+
+  //imuAdatok();
 }
