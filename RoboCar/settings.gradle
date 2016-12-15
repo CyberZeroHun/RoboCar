@@ -1,1 +1,1 @@
-include ':app', ':joystick', ':ultrasonic', ':bluetooth'
+include ':app', ':joystick', ':ultrasonic', ':bluetooth', ':map', ':arrowbutton'

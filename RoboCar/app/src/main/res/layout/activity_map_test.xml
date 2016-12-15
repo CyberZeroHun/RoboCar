@@ -12,7 +12,7 @@
     tools:context="hu.uniobuda.nik.robocar.MapTestActivity"
     >
 
-    <!--
+
     <hu.uniobuda.nik.map.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
@@ -20,5 +20,4 @@
         >
 
     </hu.uniobuda.nik.map.MapView>
--->
 </RelativeLayout>

@@ -36,4 +36,5 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: '../bluetooth')
     compile project(path: ':bluetooth')
     //compile project(path: ':map')
+    compile project(':map')
 }
